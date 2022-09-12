@@ -36,6 +36,8 @@ class MainActivity : AppCompatActivity() {
 
         toggle.setOnCheckedChangeListener { _, isChecked ->
 //            Toast.makeText(this, if(isChecked) "Convert To RGB" else "Convert To HEX", Toast.LENGTH_SHORT).show()
+//            check if the toggle button is ON
+//            True -> conversion to RGB, False -> conversion to HEX
             if (isChecked){
                 // change labels
                 title_string.setText("Convertion to RGB")
@@ -47,9 +49,11 @@ class MainActivity : AppCompatActivity() {
                 green_input.setVisibility(View.INVISIBLE)
                 hex_input.setVisibility(View.VISIBLE)
                 hex_input.setText(hex_input.text.toString())
+//                set input text color to matrix-green
                 hex_input.setTextColor(Color.parseColor("#2955C4"))
                 blue_input.setVisibility(View.INVISIBLE)
 
+//              Validation - the input box accept not move than 7 characters(the total length of a hex color code)
                 val maxLength = 7
                 hex_input.setFilters(arrayOf<InputFilter>(LengthFilter(maxLength)))
 
@@ -70,15 +74,22 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
-
+//        On convert button pressed
         convert.setOnClickListener {
+//            If the toggle button is checked --> conversion to rgb else conversion to HEX
             if (toggle.isChecked){
                 Toast.makeText(this, "converting to rgb", Toast.LENGTH_SHORT).show()
-                val r = hex_input.text.toString().substring(1,3)
-                val g = hex_input.text.toString().substring(3,5)
-                val b = hex_input.text.toString().substring(5,7)
-                color_output.setText(Integer.decode("0x" + r.toString()).toString() + ", " + Integer.decode("0x" + g.toString().toString()) + ", " + Integer.decode("0x" + b.toString()).toString())
-                convert_to_rgb(Integer.decode("0x" + r.toString()).toString(), Integer.decode("0x" + g.toString()).toString(), Integer.decode("0x" + b.toString()).toString())
+                try {
+                    val r = hex_input.text.toString().substring(1,3)
+                    val g = hex_input.text.toString().substring(3,5)
+                    val b = hex_input.text.toString().substring(5,7)
+                    color_output.setText(Integer.decode("0x" + r.toString()).toString() + ", " + Integer.decode("0x" + g.toString().toString()) + ", " + Integer.decode("0x" + b.toString()).toString())
+                    convert_to_rgb(Integer.decode("0x" + r.toString()).toString(), Integer.decode("0x" + g.toString()).toString(), Integer.decode("0x" + b.toString()).toString())
+
+                }catch (e: Exception){
+                    Toast.makeText(this, "converting to rgb", Toast.LENGTH_SHORT).show()
+                }
+
             }else{
                 if (findViewById<EditText>(R.id.red_input).text.toString() == "" || findViewById<EditText>(R.id.green_input).text.toString() == "" || findViewById<EditText>(R.id.blue_input).text.toString() == ""){
                     return@setOnClickListener
@@ -113,14 +124,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun convert_to_rgb(r: String, g: String, b: String) {
-        val rangi = findViewById<TextView>(R.id.output_color)
-        findViewById<View>(R.id.view).setBackgroundColor(Color.rgb(r.toInt(), g.toInt(), b.toInt()))
+        try {
+            val rangi = findViewById<TextView>(R.id.output_color)
+            findViewById<View>(R.id.view).setBackgroundColor(Color.rgb(r.toInt(), g.toInt(), b.toInt()))
 
-        if ((r.toInt() > 200 && g.toInt() > 200) || (r.toInt() > 200 && b.toInt() > 200) || (g.toInt() > 200 && b.toInt() > 200)) {
-            rangi.setTextColor(Color.BLACK)
-        }else{
-            rangi.setTextColor(Color.WHITE)
+            if ((r.toInt() > 200 && g.toInt() > 200) || (r.toInt() > 200 && b.toInt() > 200) || (g.toInt() > 200 && b.toInt() > 200)) {
+                rangi.setTextColor(Color.BLACK)
+            }else{
+                rangi.setTextColor(Color.WHITE)
+            }
+
+        }catch (e: Exception){
+            Toast.makeText(this, "Error Occurred", Toast.LENGTH_SHORT).show()
         }
+
     }
 
     private fun do_convertion(r: Int, g: Int, b: Int) {
